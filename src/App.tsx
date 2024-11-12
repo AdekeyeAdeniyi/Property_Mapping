@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
-import { APIProvider, Map } from '@vis.gl/react-google-maps';
+import React, { useState, useRef, useEffect } from 'react';
+import { APIProvider, Map, MapEvent } from '@vis.gl/react-google-maps';
+
 import { Property } from './types/types';
 import PropertyMarker from './components/PropertyMarker';
+import FloridaCitiesDropdown from './components/FloridaCitiesDropdown';
+import { ICity } from 'country-state-city';
 
 const properties: Property[] = [
   {
@@ -57,22 +60,43 @@ const API_KEY = import.meta.env.VITE_APP_GOOGLE_MAPS_API_KEY;
 const MAP_ID = import.meta.env.VITE_APP_GOOGLE_MAPS_ID;
 
 const App: React.FC = () => {
-  const [markerLocation] = useState({
-    lat: averageLat,
-    lng: averageLng,
-  });
   const [selectedZpid, setSelectedZpid] = useState<string | null>(null);
+  const [selectedCity, setSelectedCity] = useState<ICity | null>(null); // Track selected city
+  const mapRef = useRef<MapEvent | null>(null); // Reference for the map instance
+
+  // Handle city selection
+  const handleCitySelect = (city: ICity) => {
+    setSelectedCity(city); // Update selected city state
+  };
+
+  // Dynamically update zoom and center on city change
+  useEffect(() => {
+    if (selectedCity && mapRef.current) {
+      const { latitude, longitude } = selectedCity;
+      if (latitude && longitude) {
+        mapRef.current.map.panTo({
+          lat: parseFloat(latitude),
+          lng: parseFloat(longitude),
+        });
+        mapRef.current.map.setZoom(10);
+      }
+    }
+  }, [selectedCity]);
 
   return (
-    <div className="w-full h-[100vh] max-w-[100%] border-[8px]">
+    <div className="relative w-full h-[100vh] max-w-[100%] border-[8px]">
       <APIProvider apiKey={API_KEY}>
         <Map
           mapId={MAP_ID}
           className="w-full h-full"
           defaultZoom={7}
-          defaultCenter={markerLocation}
+          defaultCenter={{ lat: averageLat, lng: averageLng }}
           gestureHandling={'greedy'}
           disableDefaultUI={true}
+          onTilesLoaded={map => {
+            // Save the map instance in the ref
+            mapRef.current = map;
+          }}
         >
           {properties.map(property => (
             <PropertyMarker
@@ -80,10 +104,15 @@ const App: React.FC = () => {
               property={property}
               selectedZpid={selectedZpid}
               setSelectedZpid={setSelectedZpid}
+              map={mapRef.current}
             />
           ))}
         </Map>
       </APIProvider>
+
+      <div className="p-4 absolute w-full top-0 left-0 z-10">
+        <FloridaCitiesDropdown onSelect={handleCitySelect} />
+      </div>
     </div>
   );
 };
