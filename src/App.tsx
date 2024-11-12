@@ -38,8 +38,13 @@ const App: React.FC = () => {
     const fetchData = async () => {
       try {
         const data = await fetchZillowData();
-        setProperties(data);
-        setPreloader(false);
+
+        if (data) {
+          setProperties(data);
+          setPreloader(false);
+        } else {
+          console.log('No record found');
+        }
       } catch (error) {
         console.error('Error fetching Zillow data:', error);
         setPreloader(false); // Stop preloader even if there's an error
@@ -104,6 +109,12 @@ const App: React.FC = () => {
               ))}
             </Map>
           </APIProvider>
+
+          {properties.length <= 0 && (
+            <h4 className="text-6xl absolute top-1/2 left-1/2 font-bold -translate-x-2/4 -translate-y-2/4 text-red-500">
+              No Record Found
+            </h4>
+          )}
 
           <div className="inline-flex gap-4 flex-col p-4 absolute w-fit top-0 left-0 z-10">
             <FloridaCitiesDropdown onSelect={handleCitySelect} />
