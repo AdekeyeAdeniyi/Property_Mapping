@@ -27,8 +27,9 @@ import { extractStoreProperties } from '../utils/utils';
 
 const fetchZillowData = async () => {
   try {
-    // Fetch properties.txt file from the public directory
-    const response = await fetch('/properties.txt'); // Make sure the file is in the 'public' folder
+    const baseURL = window.location.origin;
+
+    const response = await fetch(`${baseURL}/properties.txt`);
 
     // Check if the response is OK (status 200)
     if (!response.ok) {
