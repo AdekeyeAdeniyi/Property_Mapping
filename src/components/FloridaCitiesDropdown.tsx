@@ -3,19 +3,22 @@ import { City, State } from 'country-state-city';
 import { ICity } from 'country-state-city';
 
 interface FloridaCitiesDropdownProps {
-  onSelect: (selectedCity: ICity) => void; // Callback to pass the selected city
+  onSelect: (selectedCity: ICity) => void;
 }
 
 const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = ({
   onSelect,
 }) => {
+  const savedCity = localStorage.getItem('selectedCity');
   const [isOpen, setIsOpen] = useState(false);
   const [cities, setCities] = useState<ICity[]>([]);
-  const [filteredCities, setFilteredCities] = useState<ICity[]>([]); // State to store filtered cities
-  const [searchQuery, setSearchQuery] = useState(''); // State for search input
+  const [filteredCities, setFilteredCities] = useState<ICity[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const floridaState = State.getStateByCodeAndCountry('FL', 'US');
-  const [selectedCity, setSelectedCity] = useState('Select City');
+  const [selectedCity, setSelectedCity] = useState(
+    savedCity ? JSON.parse(savedCity).name : 'Select City'
+  );
 
   // Fetch cities in Florida when the component mounts
   useEffect(() => {
@@ -31,7 +34,6 @@ const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = ({
     const query = event.target.value.toLowerCase();
     setSearchQuery(query);
 
-    // Filter cities based on the query
     const filtered = cities.filter(city =>
       city.name.toLowerCase().includes(query)
     );
@@ -44,9 +46,10 @@ const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = ({
   };
 
   // Handle city selection
-  const handleItemClick = (cityName: ICity) => {
-    setSelectedCity(cityName.name);
-    onSelect(cityName);
+  const handleItemClick = (city: ICity) => {
+    setSelectedCity(city.name);
+    onSelect(city);
+    localStorage.setItem('selectedCity', JSON.stringify(city));
     setIsOpen(false);
   };
 
@@ -99,13 +102,13 @@ const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = ({
           className="z-10 absolute h-[300px] overflow-y-auto bg-white divide-y divide-gray-100 rounded-lg shadow w-44 mt-2 dark:bg-gray-700"
         >
           {/* Search input field */}
-          <div className=" p-2">
+          <div className="p-2">
             <input
               type="text"
               value={searchQuery}
               onChange={handleSearchChange}
               placeholder="Search City"
-              className="w-full p-2 h-8 text-sm  border rounded-sm focus:outline-none"
+              className="w-full p-2 h-8 text-sm border rounded-sm focus:outline-none"
             />
           </div>
 
