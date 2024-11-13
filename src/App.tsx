@@ -11,7 +11,7 @@ import {
 } from './constants';
 import FloridaCitiesDropdown from './components/FloridaCitiesDropdown';
 import { ICity } from 'country-state-city';
-import fetchZillowData from './api/fetchData';
+// import fetchZillowData from './api/fetchData';
 import PriceIndicator from './components/PriceIndicator';
 import Preloader from './components/Preloader';
 
@@ -23,8 +23,8 @@ const App: React.FC = () => {
   });
   const [zoomLevel, setZoomLevel] = useState(DEFAULT_ZOOM);
   const mapRef = useRef<MapEvent | null>(null); // Reference for the map instance
-  const [properties, setProperties] = useState<PropertyData[]>([]);
-  const [preloader, setPreloader] = useState(true);
+  const [properties] = useState<PropertyData[]>([]);
+  const [preloader] = useState(true);
   const [coordinates, setCoordinates] = useState(DEFAULT_COORDINATES);
 
   // Handle city selection
@@ -35,23 +35,23 @@ const App: React.FC = () => {
 
   // Fetch data and update map on city change
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await fetchZillowData();
+    // const fetchData = async () => {
+    //   try {
+    //     const data = await fetchZillowData();
 
-        if (data) {
-          setProperties(data);
-          setPreloader(false);
-        } else {
-          console.log('No record found');
-        }
-      } catch (error) {
-        console.error('Error fetching Zillow data:', error);
-        setPreloader(false); // Stop preloader even if there's an error
-      }
-    };
+    //     if (data) {
+    //       setProperties(data);
+    //       setPreloader(false);
+    //     } else {
+    //       console.log('No record found');
+    //     }
+    //   } catch (error) {
+    //     console.error('Error fetching Zillow data:', error);
+    //     setPreloader(false); // Stop preloader even if there's an error
+    //   }
+    // };
 
-    fetchData();
+    // fetchData();
 
     if (selectedCity && mapRef.current) {
       const { latitude, longitude } = selectedCity;
@@ -79,7 +79,7 @@ const App: React.FC = () => {
 
   return (
     <>
-      {preloader ? (
+      {!preloader ? (
         <Preloader />
       ) : (
         <div className="relative w-full h-[100vh] max-w-[100%] border-[8px]">
