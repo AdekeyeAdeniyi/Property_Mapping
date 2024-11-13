@@ -35,23 +35,23 @@ const App: React.FC = () => {
 
   // Fetch data and update map on city change
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await fetchZillowData();
+    // const fetchData = async () => {
+    //   try {
+    //     const data = await fetchZillowData();
 
-        if (data) {
-          setProperties(data);
-          setPreloader(false);
-        } else {
-          console.log('No record found');
-        }
-      } catch (error) {
-        console.error('Error fetching Zillow data:', error);
-        setPreloader(false); // Stop preloader even if there's an error
-      }
-    };
+    //     if (data) {
+    //       setProperties(data);
+    //       setPreloader(false);
+    //     } else {
+    //       console.log('No record found');
+    //     }
+    //   } catch (error) {
+    //     console.error('Error fetching Zillow data:', error);
+    //     setPreloader(false); // Stop preloader even if there's an error
+    //   }
+    // };
 
-    fetchData();
+    // fetchData();
 
     if (selectedCity && mapRef.current) {
       const { latitude, longitude } = selectedCity;

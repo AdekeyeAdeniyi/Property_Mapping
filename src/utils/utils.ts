@@ -34,13 +34,13 @@ export const getStyleByPrice = (price: number) => {
       glyphColor: '#000',
       borderColor: '#000',
     };
-  } else if (price >= 510000 && price <= 800000) {
+  } else if (price >= 50001 && price <= 800000) {
     return {
       background: PRICEINDICATOR.medium,
       glyphColor: '#000',
       borderColor: '#000',
     };
-  } else if (price >= 810000) {
+  } else if (price >= 80001) {
     return {
       background: PRICEINDICATOR.high,
       glyphColor: '#000',
