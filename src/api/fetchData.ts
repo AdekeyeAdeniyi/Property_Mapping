@@ -1,20 +1,20 @@
 import { extractStoreProperties } from '../utils/utils';
-import { saveToDB, getFromDB, isDataStale } from '../database/IndexedDB';
+// import { saveToDB, getFromDB, isDataStale } from '../database/IndexedDB';
 
 const fetchZillowData = async () => {
   const API_KEY = import.meta.env.VITE_APP_ZILL_API_KEY;
   const API_URL = import.meta.env.VITE_APP_ZILL_URL;
 
-  // Check IndexedDB for cached data
-  const cachedRecord = await getFromDB('zillowData');
+  // // Check IndexedDB for cached data
+  // const cachedRecord = await getFromDB('zillowData');
 
-  if (cachedRecord) {
-    const { value, timestamp } = cachedRecord;
-    if (!isDataStale(timestamp)) {
-      console.log('Using cached data from IndexedDB');
-      return value;
-    }
-  }
+  // if (cachedRecord) {
+  //   const { value, timestamp } = cachedRecord;
+  //   if (!isDataStale(timestamp)) {
+  //     console.log('Using cached data from IndexedDB');
+  //     return value;
+  //   }
+  // }
 
   // Fetch new data if not cached or data is stale
   try {
@@ -34,7 +34,7 @@ const fetchZillowData = async () => {
     const properties = extractStoreProperties(jsonData);
 
     // Save fetched data to IndexedDB
-    await saveToDB('zillowData', properties);
+    // await saveToDB('zillowData', properties);
 
     return properties;
   } catch (error) {
