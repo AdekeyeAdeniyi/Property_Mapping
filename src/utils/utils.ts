@@ -62,3 +62,11 @@ export const convertTimestampToDate = (timestamp: number) => {
   const year = date.getUTCFullYear();
   return `${day}/${month}/${year}`;
 };
+
+export const isLocalStorageEnabled = () => {
+  if (typeof window.localStorage !== 'undefined') {
+    return true;
+  } else {
+    return false;
+  }
+};

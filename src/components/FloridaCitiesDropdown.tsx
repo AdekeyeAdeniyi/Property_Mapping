@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { City, State } from 'country-state-city';
 import { ICity } from 'country-state-city';
+import { isLocalStorageEnabled } from '../utils/utils';
 
 interface FloridaCitiesDropdownProps {
   onSelect: (selectedCity: ICity) => void;
@@ -9,7 +10,8 @@ interface FloridaCitiesDropdownProps {
 const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = ({
   onSelect,
 }) => {
-  const savedCity = localStorage.getItem('selectedCity');
+  const savedCity =
+    isLocalStorageEnabled() && localStorage.getItem('selectedCity');
   const [isOpen, setIsOpen] = useState(false);
   const [cities, setCities] = useState<ICity[]>([]);
   const [filteredCities, setFilteredCities] = useState<ICity[]>([]);
@@ -49,7 +51,8 @@ const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = ({
   const handleItemClick = (city: ICity) => {
     setSelectedCity(city.name);
     onSelect(city);
-    localStorage.setItem('selectedCity', JSON.stringify(city));
+    isLocalStorageEnabled() &&
+      localStorage.setItem('selectedCity', JSON.stringify(city));
     setIsOpen(false);
   };
 

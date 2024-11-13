@@ -14,11 +14,13 @@ import { ICity } from 'country-state-city';
 // import fetchZillowData from './api/fetchData';
 import PriceIndicator from './components/PriceIndicator';
 import Preloader from './components/Preloader';
+import { isLocalStorageEnabled } from './utils/utils';
 
 const App: React.FC = () => {
   const [selectedZpid, setSelectedZpid] = useState<string | null>(null);
   const [selectedCity, setSelectedCity] = useState<ICity | null>(() => {
-    const storedCity = localStorage.getItem('selectedCity');
+    const storedCity =
+      isLocalStorageEnabled() && localStorage.getItem('selectedCity');
     return storedCity ? JSON.parse(storedCity) : null;
   });
   const [zoomLevel, setZoomLevel] = useState(DEFAULT_ZOOM);
@@ -30,7 +32,8 @@ const App: React.FC = () => {
   // Handle city selection
   const handleCitySelect = (city: ICity) => {
     setSelectedCity(city);
-    localStorage.setItem('selectedCity', JSON.stringify(city)); // Save city in local storage
+    isLocalStorageEnabled() &&
+      localStorage.setItem('selectedCity', JSON.stringify(city)); // Save city in local storage
   };
 
   // Fetch data and update map on city change
