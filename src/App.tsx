@@ -95,7 +95,8 @@ const App: React.FC = () => {
                 lat: coordinates.latitude,
                 lng: coordinates.longitude,
               }}
-              gestureHandling="greedy"
+              gestureHandling={'greedy'}
+              disableDefaultUI={true}
               onTilesLoaded={map => {
                 mapRef.current = map;
               }}
