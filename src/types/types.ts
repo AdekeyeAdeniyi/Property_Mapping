@@ -1,5 +1,3 @@
-import { MapEvent } from '@vis.gl/react-google-maps';
-
 // Interface for latitude and longitude
 interface LatLong {
   latitude: number;
