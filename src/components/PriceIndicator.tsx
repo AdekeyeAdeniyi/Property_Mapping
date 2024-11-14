@@ -3,7 +3,9 @@ import { PRICEINDICATOR } from '../constants';
 const PriceIndicator: React.FC = () => {
   return (
     <div>
-      <h2 className="text-black text-sm font-semibold">Maker Indicators:</h2>
+      <h2 className="text-black text-base w-fit font-semibold bg-white p-2 rounded">
+        Maker Indicators:
+      </h2>
 
       <div className="flex flex-col gap-2 pt-2">
         <div

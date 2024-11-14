@@ -31,8 +31,6 @@ export const getStyleByPrice = (price: number) => {
   if (price >= 0 && price <= 500000) {
     return {
       background: PRICEINDICATOR.low,
-      glyphColor: '#000',
-      borderColor: '#000',
     };
   } else if (price >= 50001 && price <= 800000) {
     return {

@@ -1,3 +1,5 @@
+import { MapEvent } from '@vis.gl/react-google-maps';
+
 // Interface for latitude and longitude
 interface LatLong {
   latitude: number;
@@ -25,36 +27,9 @@ export interface PropertyData {
   hdpData: HdpData;
 }
 
-// export type Property = {
-//   zpid: string;
-//   image: string;
-//   latLong: {
-//     latitude: number;
-//     longitude: number;
-//   };
-//   address: string;
-//   price: string;
-// };
-
-// export interface PropertyData {
-//   property_id: string;
-//   status: string;
-//   list_date: string;
-//   last_sold_date: string;
-//   last_sold_price: number;
-//   location: {
-//     address: {
-//       line: string;
-//       unit: string;
-//       street_number: string;
-//       street_name: string;
-//       street_suffix: string;
-//       city: string;
-//       postal_code: string;
-//       state_code: string;
-//       state: string;
-//       country: string;
-//     };
-//   };
-// }
-// [];
+export interface PropertyMarkerProps {
+  property: PropertyData;
+  selectedZpid: string | null;
+  setSelectedZpid: (zpid: string | null) => void;
+  map: google.maps.Map;
+}

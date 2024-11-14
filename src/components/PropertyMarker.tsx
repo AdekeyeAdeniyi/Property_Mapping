@@ -30,7 +30,9 @@ const PropertyMarker: React.FC<PropertyMarkerProps> = ({
   const [markerRef, marker] = useAdvancedMarkerRef();
 
   const handleMarkerClick = useCallback(() => {
-    setSelectedZpid(isSelected ? null : property.address);
+    if (property.hdpData) {
+      setSelectedZpid(isSelected ? null : property.address);
+    }
     handleDoubleClick();
   }, [isSelected, property.address, setSelectedZpid]);
 
@@ -59,7 +61,8 @@ const PropertyMarker: React.FC<PropertyMarkerProps> = ({
       onClick={handleMarkerClick}
     >
       <Pin {...getStyleByPrice(property?.hdpData?.homeInfo?.price || 0)} />
-      {isSelected && (
+
+      {isSelected && property.hdpData && (
         <InfoWindow anchor={marker} onClose={handleClose}>
           <article className="max-w-[400px] w-full mt-2">
             <div className="w-full h-[100px]">
