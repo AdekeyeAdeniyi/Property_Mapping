@@ -9,7 +9,6 @@ import {
   MAP_ID,
   API_KEY,
 } from './constants';
-import FloridaCitiesDropdown from './components/FloridaCitiesDropdown';
 import fetchZillowData from './api/fetchData';
 import PriceIndicator from './components/PriceIndicator';
 import Preloader from './components/Preloader';
