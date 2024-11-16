@@ -1,17 +1,25 @@
 import { useEffect, useRef, useState } from 'react';
+import { GetCity } from 'react-country-state-city';
 
 const FloridaCitiesDropdown: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [cities, setCities] = useState<any[]>([]); // Array to hold cities
+  const [filteredCities, setFilteredCities] = useState<any[]>([]);
+  const [selectedCity, setSelectedCity] = useState<string>(''); // State for selected city
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Toggle dropdown visibility
-  const toggleDropdown = () => {
-    setIsOpen(prev => !prev);
-  };
-
-  // Close dropdown if clicking outside of it
+  // Fetch cities in Florida when component mounts
   useEffect(() => {
+    const fetchCities = async () => {
+      const cityList = await GetCity(233, 1436); // Fetch cities using GetCity API
+      setCities(cityList);
+      setFilteredCities(cityList); // Initially, all cities are shown
+    };
+
+    fetchCities();
+
+    // Close dropdown if clicking outside of it
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (
         dropdownRef.current &&
@@ -22,16 +30,40 @@ const FloridaCitiesDropdown: React.FC = () => {
     };
 
     document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('touchstart', handleClickOutside); // Add touch support
+    document.addEventListener('touchstart', handleClickOutside);
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('touchstart', handleClickOutside);
     };
   }, []);
 
+  // Filter cities based on search query
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const query = event.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    const filtered = cities.filter(city =>
+      city.name.toLowerCase().includes(query)
+    );
+    setFilteredCities(filtered);
+  };
+
+  // Toggle dropdown visibility
+  const toggleDropdown = () => {
+    setIsOpen(prev => !prev);
+  };
+
   // Ensure dropdown scrolls into view on input focus
   const handleInputFocus = (event: React.FocusEvent<HTMLInputElement>) => {
     event.target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+
+  // Handle city selection
+  const handleCitySelect = (city: string) => {
+    setSelectedCity(city);
+    console.log('Selected city:', city); // Log selected city
+    setIsOpen(false); // Close dropdown after selection
   };
 
   return (
@@ -45,7 +77,7 @@ const FloridaCitiesDropdown: React.FC = () => {
         className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         type="button"
       >
-        <span>Select City</span>
+        <span>{selectedCity || 'Select City'}</span>
         <svg
           className="w-2.5 h-2.5 ms-3"
           aria-hidden="true"
@@ -73,11 +105,37 @@ const FloridaCitiesDropdown: React.FC = () => {
             <input
               type="text"
               value={searchQuery}
+              onChange={handleSearchChange}
               onFocus={handleInputFocus}
               placeholder="Search City"
               className="w-full p-2 h-8 text-sm border rounded-sm focus:outline-none"
             />
           </div>
+
+          {/* Dropdown list */}
+          <ul
+            className="py-2 text-sm text-gray-700 dark:text-gray-200"
+            aria-labelledby="dropdownButton"
+          >
+            {filteredCities.length > 0 ? (
+              filteredCities.map((city, index) => (
+                <li key={index}>
+                  <button
+                    className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                    onClick={() => handleCitySelect(city.name)} // Pass city name to handler
+                  >
+                    {city.name}
+                  </button>
+                </li>
+              ))
+            ) : (
+              <li>
+                <span className="block px-4 py-2 text-left text-gray-500">
+                  No cities found
+                </span>
+              </li>
+            )}
+          </ul>
         </div>
       )}
     </div>
