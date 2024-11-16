@@ -1,10 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { City, State } from 'country-state-city';
 import { ICity } from 'country-state-city';
-
-interface FloridaCitiesDropdownProps {
-  onSelect?: (selectedCity: ICity) => void;
-}
+import { FloridaCitiesDropdownProps } from '../types/types';
 
 const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,7 +38,7 @@ const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = () => {
 
   // Close dropdown if clicking outside of it
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
@@ -51,13 +48,23 @@ const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = () => {
     };
 
     document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside); // Add touch support
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
     };
   }, []);
 
+  // Ensure dropdown scrolls into view on input focus
+  const handleInputFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+    event.target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+
   return (
-    <div className="relative inline-block text-left" ref={dropdownRef}>
+    <div
+      className="relative inline-block text-left w-full sm:w-auto"
+      ref={dropdownRef}
+    >
       <button
         id="dropdownButton"
         onClick={toggleDropdown}
@@ -85,7 +92,7 @@ const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = () => {
       {isOpen && (
         <div
           id="dropdown"
-          className="z-10 absolute h-[300px] overflow-y-auto bg-white divide-y divide-gray-100 rounded-lg shadow w-44 mt-2 dark:bg-gray-700"
+          className="z-10 absolute max-h-[300px] overflow-y-auto bg-white divide-y divide-gray-100 rounded-lg shadow w-full sm:w-44 mt-2 dark:bg-gray-700"
         >
           {/* Search input field */}
           <div className="p-2">
@@ -93,6 +100,7 @@ const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = () => {
               type="text"
               value={searchQuery}
               onChange={handleSearchChange}
+              onFocus={handleInputFocus}
               placeholder="Search City"
               className="w-full p-2 h-8 text-sm border rounded-sm focus:outline-none"
             />
