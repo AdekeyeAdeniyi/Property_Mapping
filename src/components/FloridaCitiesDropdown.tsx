@@ -9,16 +9,13 @@ interface FloridaCitiesDropdownProps {
 const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = ({
   onSelect,
 }) => {
-  const savedCity = sessionStorage.getItem('selectedCity');
   const [isOpen, setIsOpen] = useState(false);
   const [cities, setCities] = useState<ICity[]>([]);
   const [filteredCities, setFilteredCities] = useState<ICity[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const floridaState = State.getStateByCodeAndCountry('FL', 'US');
-  const [selectedCity, setSelectedCity] = useState(
-    savedCity ? JSON.parse(savedCity).name : 'Select City'
-  );
+  const [selectedCity, setSelectedCity] = useState('Select City');
 
   // Fetch cities in Florida when the component mounts
   useEffect(() => {
@@ -49,7 +46,6 @@ const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = ({
   const handleItemClick = (city: ICity) => {
     setSelectedCity(city.name);
     onSelect(city);
-    sessionStorage.setItem('selectedCity', JSON.stringify(city));
     setIsOpen(false);
   };
 

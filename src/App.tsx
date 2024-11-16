@@ -19,10 +19,7 @@ const App: React.FC = () => {
   const [selectedZpid, setSelectedZpid] = useState<string | null>(null);
 
   const [zoomLevel, setZoomLevel] = useState(DEFAULT_ZOOM);
-  const [selectedCity, setSelectedCity] = useState<ICity | null>(() => {
-    const storedCity = sessionStorage.getItem('selectedCity');
-    return storedCity ? JSON.parse(storedCity) : null;
-  });
+  const [selectedCity, setSelectedCity] = useState<ICity | null>();
   const mapRef = useRef<MapEvent | null>(null);
   const [properties, setProperties] = useState<PropertyData[]>([]);
   const [preloader, setPreloader] = useState(true);
@@ -30,7 +27,6 @@ const App: React.FC = () => {
 
   const handleCitySelect = (city: ICity) => {
     setSelectedCity(city);
-    sessionStorage.setItem('selectedCity', JSON.stringify(city));
   };
 
   // Fetch data and update map on city change

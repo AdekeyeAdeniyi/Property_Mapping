@@ -27,7 +27,6 @@ const Preloader = () => {
     heading: string;
     title: string;
   } | null>(null);
-
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * titles.length);
     setRandomTitle(titles[randomIndex]);
