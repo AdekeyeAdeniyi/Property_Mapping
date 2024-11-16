@@ -1,15 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { GetCity } from 'react-country-state-city';
+import { City } from 'react-country-state-city/dist/esm/types';
+import { FloridaCitiesDropdownProps } from '../types/types';
 
-const FloridaCitiesDropdown: React.FC = () => {
+const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = ({
+  onCitySelect,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [cities, setCities] = useState<any[]>([]); // Array to hold cities
-  const [filteredCities, setFilteredCities] = useState<any[]>([]);
-  const [selectedCity, setSelectedCity] = useState<string>(''); // State for selected city
+  const [cities, setCities] = useState<City[] | []>([]); // Array to hold cities
+  const [filteredCities, setFilteredCities] = useState<City[] | []>([]);
+  const [selectedCity, setSelectedCity] = useState<City | string>(
+    localStorage.getItem('selectedCity')
+      ? JSON.parse(localStorage.getItem('selectedCity')!)
+      : 'Select City'
+  ); // Handle localStorage or default value
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Fetch cities in Florida when component mounts
   useEffect(() => {
     const fetchCities = async () => {
       const cityList = await GetCity(233, 1436); // Fetch cities using GetCity API
@@ -38,7 +45,6 @@ const FloridaCitiesDropdown: React.FC = () => {
     };
   }, []);
 
-  // Filter cities based on search query
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value.toLowerCase();
     setSearchQuery(query);
@@ -49,21 +55,18 @@ const FloridaCitiesDropdown: React.FC = () => {
     setFilteredCities(filtered);
   };
 
-  // Toggle dropdown visibility
   const toggleDropdown = () => {
     setIsOpen(prev => !prev);
   };
 
-  // Ensure dropdown scrolls into view on input focus
   const handleInputFocus = (event: React.FocusEvent<HTMLInputElement>) => {
     event.target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
 
-  // Handle city selection
-  const handleCitySelect = (city: string) => {
+  const handleCitySelect = (city: City) => {
     setSelectedCity(city);
-    localStorage.setItem('selectedCity', city);
-    console.log('Selected city:', city); // Log selected city
+    localStorage.setItem('selectedCity', JSON.stringify(city)); // Store city object in localStorage
+    onCitySelect(city); // Send selected city to the parent component
     setIsOpen(false); // Close dropdown after selection
   };
 
@@ -75,10 +78,14 @@ const FloridaCitiesDropdown: React.FC = () => {
       <button
         id="dropdownButton"
         onClick={toggleDropdown}
-        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         type="button"
       >
-        <span>{selectedCity || 'Select City'}</span>
+        <span>
+          {selectedCity && typeof selectedCity !== 'string'
+            ? selectedCity.name
+            : selectedCity}
+        </span>
         <svg
           className="w-2.5 h-2.5 ms-3"
           aria-hidden="true"
@@ -101,7 +108,6 @@ const FloridaCitiesDropdown: React.FC = () => {
           id="dropdown"
           className="z-10 absolute max-h-[300px] overflow-y-auto bg-white divide-y divide-gray-100 rounded-lg shadow w-full sm:w-44 mt-2 dark:bg-gray-700"
         >
-          {/* Search input field */}
           <div className="p-2">
             <input
               type="text"
@@ -109,13 +115,12 @@ const FloridaCitiesDropdown: React.FC = () => {
               onChange={handleSearchChange}
               onFocus={handleInputFocus}
               placeholder="Search City"
-              className="w-full p-2 h-8 text-sm border rounded-sm focus:outline-none"
+              className="w-full p-2 h-8 text-xs md:text-sm border rounded-sm focus:outline-none"
             />
           </div>
 
-          {/* Dropdown list */}
           <ul
-            className="py-2 text-sm text-gray-700 dark:text-gray-200"
+            className="py-2 text-xs md:text-sm text-gray-700 dark:text-gray-200"
             aria-labelledby="dropdownButton"
           >
             {filteredCities.length > 0 ? (
@@ -123,7 +128,7 @@ const FloridaCitiesDropdown: React.FC = () => {
                 <li key={index}>
                   <button
                     className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                    onClick={() => handleCitySelect(city.name)} // Pass city name to handler
+                    onClick={() => handleCitySelect(city)} // Pass city object to handler
                   >
                     {city.name}
                   </button>

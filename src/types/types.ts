@@ -1,3 +1,5 @@
+import { City } from 'react-country-state-city/dist/esm/types';
+
 // Interface for latitude and longitude
 interface LatLong {
   latitude: number;
@@ -30,4 +32,8 @@ export interface PropertyMarkerProps {
   selectedZpid: string | null;
   setSelectedZpid: (zpid: string | null) => void;
   map: google.maps.Map;
+}
+
+export interface FloridaCitiesDropdownProps {
+  onCitySelect: (city: City) => void; // Prop to handle city selection
 }

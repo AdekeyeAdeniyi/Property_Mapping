@@ -64,7 +64,7 @@ const PropertyMarker: React.FC<PropertyMarkerProps> = ({
 
       {isSelected && property.hdpData && (
         <InfoWindow anchor={marker} onClose={handleClose}>
-          <article className="max-w-[400px] w-full mt-2">
+          <article className="max-w-[300px] w-full mt-2">
             <div className="w-full h-[100px]">
               <img
                 src={property.imgSrc}
