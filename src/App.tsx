@@ -12,6 +12,7 @@ import {
 import fetchZillowData from './api/fetchData';
 import PriceIndicator from './components/PriceIndicator';
 import Preloader from './components/Preloader';
+import FloridaCitiesDropdown from './components/FloridaCitiesDropdown';
 
 const App: React.FC = () => {
   const [selectedZpid, setSelectedZpid] = useState<string | null>(null);
@@ -83,6 +84,7 @@ const App: React.FC = () => {
           )}
 
           <div className="inline-flex gap-10 flex-col p-4 absolute w-fit top-20 left-0 z-10">
+            <FloridaCitiesDropdown />
             <PriceIndicator />
           </div>
         </div>
