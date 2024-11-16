@@ -1,35 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { City, State } from 'country-state-city';
-import { ICity } from 'country-state-city';
 import { FloridaCitiesDropdownProps } from '../types/types';
 
 const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [cities, setCities] = useState<ICity[]>([]);
-  const [filteredCities, setFilteredCities] = useState<ICity[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const floridaState = State.getStateByCodeAndCountry('FL', 'US');
-
-  // Fetch cities in Florida when the component mounts
-  useEffect(() => {
-    if (floridaState) {
-      const cityList = City.getCitiesOfState('US', floridaState.isoCode);
-      setCities(cityList);
-      setFilteredCities(cityList); // Initially, all cities are shown
-    }
-  }, [floridaState]);
-
-  // Filter cities based on search query
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const query = event.target.value.toLowerCase();
-    setSearchQuery(query);
-
-    const filtered = cities.filter(city =>
-      city.name.toLowerCase().includes(query)
-    );
-    setFilteredCities(filtered);
-  };
 
   // Toggle dropdown visibility
   const toggleDropdown = () => {
@@ -99,34 +74,11 @@ const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = () => {
             <input
               type="text"
               value={searchQuery}
-              onChange={handleSearchChange}
               onFocus={handleInputFocus}
               placeholder="Search City"
               className="w-full p-2 h-8 text-sm border rounded-sm focus:outline-none"
             />
           </div>
-
-          {/* Dropdown list */}
-          <ul
-            className="py-2 text-sm text-gray-700 dark:text-gray-200"
-            aria-labelledby="dropdownButton"
-          >
-            {filteredCities.length > 0 ? (
-              filteredCities.map((city, index) => (
-                <li key={index}>
-                  <button className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                    {city.name}
-                  </button>
-                </li>
-              ))
-            ) : (
-              <li>
-                <span className="block px-4 py-2 text-left text-gray-500">
-                  No cities found
-                </span>
-              </li>
-            )}
-          </ul>
         </div>
       )}
     </div>
