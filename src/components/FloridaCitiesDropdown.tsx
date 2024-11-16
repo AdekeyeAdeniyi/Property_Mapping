@@ -3,19 +3,16 @@ import { City, State } from 'country-state-city';
 import { ICity } from 'country-state-city';
 
 interface FloridaCitiesDropdownProps {
-  onSelect: (selectedCity: ICity) => void;
+  onSelect?: (selectedCity: ICity) => void;
 }
 
-const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = ({
-  onSelect,
-}) => {
+const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [cities, setCities] = useState<ICity[]>([]);
   const [filteredCities, setFilteredCities] = useState<ICity[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const floridaState = State.getStateByCodeAndCountry('FL', 'US');
-  const [selectedCity, setSelectedCity] = useState('Select City');
 
   // Fetch cities in Florida when the component mounts
   useEffect(() => {
@@ -40,13 +37,6 @@ const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = ({
   // Toggle dropdown visibility
   const toggleDropdown = () => {
     setIsOpen(prev => !prev);
-  };
-
-  // Handle city selection
-  const handleItemClick = (city: ICity) => {
-    setSelectedCity(city.name);
-    onSelect(city);
-    setIsOpen(false);
   };
 
   // Close dropdown if clicking outside of it
@@ -74,7 +64,7 @@ const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = ({
         className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         type="button"
       >
-        {selectedCity}
+        <span>Select City</span>
         <svg
           className="w-2.5 h-2.5 ms-3"
           aria-hidden="true"
@@ -116,10 +106,7 @@ const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = ({
             {filteredCities.length > 0 ? (
               filteredCities.map((city, index) => (
                 <li key={index}>
-                  <button
-                    onClick={() => handleItemClick(city)}
-                    className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                  >
+                  <button className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                     {city.name}
                   </button>
                 </li>
