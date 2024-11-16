@@ -1,24 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { City, State } from 'country-state-city';
 import { ICity } from 'country-state-city';
 import { FloridaCitiesDropdownProps } from '../types/types';
 
 const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [cities, setCities] = useState<ICity[]>([]);
+  const [cities] = useState<ICity[]>([]);
   const [filteredCities, setFilteredCities] = useState<ICity[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const floridaState = State.getStateByCodeAndCountry('FL', 'US');
-
-  // Fetch cities in Florida when the component mounts
-  useEffect(() => {
-    if (floridaState) {
-      const cityList = City.getCitiesOfState('US', floridaState.isoCode);
-      setCities(cityList);
-      setFilteredCities(cityList); // Initially, all cities are shown
-    }
-  }, [floridaState]);
 
   // Filter cities based on search query
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
