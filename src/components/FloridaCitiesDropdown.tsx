@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { FloridaCitiesDropdownProps } from '../types/types';
 
-const FloridaCitiesDropdown: React.FC<FloridaCitiesDropdownProps> = () => {
+const FloridaCitiesDropdown: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);

@@ -1,5 +1,3 @@
-import { ICity } from 'country-state-city';
-
 // Interface for latitude and longitude
 interface LatLong {
   latitude: number;
@@ -32,8 +30,4 @@ export interface PropertyMarkerProps {
   selectedZpid: string | null;
   setSelectedZpid: (zpid: string | null) => void;
   map: google.maps.Map;
-}
-
-export interface FloridaCitiesDropdownProps {
-  onSelect?: (selectedCity: ICity) => void;
 }
