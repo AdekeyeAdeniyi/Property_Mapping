@@ -16,6 +16,8 @@
     "@types/react-dom": "^18.0.11",
     "@vis.gl/react-google-maps": "^1.4.0",
     "country-state-city": "^3.2.1",
+    "dexie": "^4.0.10",
+    "dexie-react-hooks": "^1.1.7",
     "idb": "^8.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

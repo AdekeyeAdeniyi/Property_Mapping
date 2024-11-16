@@ -1,11 +1,11 @@
 import { extractStoreProperties } from '../utils/utils';
-import { saveToDB, getFromDB, isDataStale } from '../database/IndexedDB';
+import { saveToDB, getFromDB, isDataStale } from '../database/IndexedDB'; // Updated Dexie-based module
 
 const fetchZillowData = async () => {
   const API_KEY = import.meta.env.VITE_APP_ZILL_API_KEY;
   const API_URL = import.meta.env.VITE_APP_ZILL_URL;
 
-  // // Check IndexedDB for cached data
+  // Check Dexie for cached data
   const cachedRecord = await getFromDB('zillowData');
 
   if (cachedRecord) {
@@ -16,7 +16,7 @@ const fetchZillowData = async () => {
     }
   }
 
-  //Fetch new data if not cached or data is stale
+  // Fetch new data if not cached or data is stale
   try {
     const apiUrl = 'https://app.scrapeak.com/v1/scrapers/zillow/listing';
     const parameters = new URLSearchParams({ api_key: API_KEY, url: API_URL });
@@ -33,7 +33,7 @@ const fetchZillowData = async () => {
 
     const properties = extractStoreProperties(jsonData);
 
-    //Save fetched data to IndexedDB
+    // Save fetched data to Dexie
     await saveToDB('zillowData', properties);
 
     return properties;

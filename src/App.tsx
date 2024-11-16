@@ -12,15 +12,26 @@ import {
 import fetchZillowData from './api/fetchData';
 import PriceIndicator from './components/PriceIndicator';
 import Preloader from './components/Preloader';
+import FloridaCitiesDropdown from './components/FloridaCitiesDropdown';
+import { ICity } from 'country-state-city';
 
 const App: React.FC = () => {
   const [selectedZpid, setSelectedZpid] = useState<string | null>(null);
 
-  const [zoomLevel] = useState(DEFAULT_ZOOM);
+  const [zoomLevel, setZoomLevel] = useState(DEFAULT_ZOOM);
+  const [selectedCity, setSelectedCity] = useState<ICity | null>(() => {
+    const storedCity = sessionStorage.getItem('selectedCity');
+    return storedCity ? JSON.parse(storedCity) : null;
+  });
   const mapRef = useRef<MapEvent | null>(null);
   const [properties, setProperties] = useState<PropertyData[]>([]);
   const [preloader, setPreloader] = useState(true);
-  const [coordinates] = useState(DEFAULT_COORDINATES);
+  const [coordinates, setCoordinates] = useState(DEFAULT_COORDINATES);
+
+  const handleCitySelect = (city: ICity) => {
+    setSelectedCity(city);
+    sessionStorage.setItem('selectedCity', JSON.stringify(city));
+  };
 
   // Fetch data and update map on city change
   useEffect(() => {
@@ -41,7 +52,30 @@ const App: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+
+    if (selectedCity && mapRef.current) {
+      const { latitude, longitude } = selectedCity;
+      if (latitude && longitude) {
+        mapRef.current.map.panTo({
+          lat: parseFloat(latitude),
+          lng: parseFloat(longitude),
+        });
+        mapRef.current.map.setZoom(10);
+      }
+    }
+
+    if (selectedCity) {
+      setZoomLevel(10);
+      setCoordinates({
+        latitude: selectedCity.latitude
+          ? parseFloat(selectedCity.latitude)
+          : DEFAULT_COORDINATES.latitude,
+        longitude: selectedCity.longitude
+          ? parseFloat(selectedCity.longitude)
+          : DEFAULT_COORDINATES.longitude,
+      });
+    }
+  }, [selectedCity]);
 
   return (
     <>
@@ -83,6 +117,7 @@ const App: React.FC = () => {
           )}
 
           <div className="inline-flex gap-10 flex-col p-4 absolute w-fit top-20 left-0 z-10">
+            <FloridaCitiesDropdown onSelect={handleCitySelect} />
             <PriceIndicator />
           </div>
         </div>
