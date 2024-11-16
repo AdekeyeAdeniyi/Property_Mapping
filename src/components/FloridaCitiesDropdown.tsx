@@ -62,6 +62,7 @@ const FloridaCitiesDropdown: React.FC = () => {
   // Handle city selection
   const handleCitySelect = (city: string) => {
     setSelectedCity(city);
+    localStorage.setItem('selectedCity', city);
     console.log('Selected city:', city); // Log selected city
     setIsOpen(false); // Close dropdown after selection
   };
