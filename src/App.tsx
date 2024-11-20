@@ -12,6 +12,7 @@ import fetchZillowData from './api/fetchData';
 import PriceIndicator from './components/PriceIndicator';
 import Preloader from './components/Preloader';
 import { useGeolocated } from 'react-geolocated';
+import { isWithinFloridaBounds } from './utils/utils';
 
 const App: React.FC = () => {
   const [selectedZpid, setSelectedZpid] = useState<string | null>(null);
@@ -62,10 +63,18 @@ const App: React.FC = () => {
     };
 
     if (coords) {
-      setCoordinates({
-        latitude: coords.latitude,
-        longitude: coords.longitude,
-      });
+      if (isWithinFloridaBounds(coords.latitude, coords.longitude)) {
+        setCoordinates({
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        });
+      } else {
+        console.log("You're not within the location boundaries");
+        setCoordinates({
+          latitude: DEFAULT_COORDINATES.latitude,
+          longitude: DEFAULT_COORDINATES.longitude,
+        });
+      }
     }
 
     fetchData();
@@ -76,7 +85,7 @@ const App: React.FC = () => {
       {preloader ? (
         <Preloader />
       ) : locationError ? (
-        <div className="w-full h-[100dvh] flex justify-center items-center flex-col text-lg">
+        <div className="w-[80%] mx-auto font-semibold h-[100dvh] flex justify-center items-center flex-col text-lg">
           <p>{locationError}</p>
         </div>
       ) : (
