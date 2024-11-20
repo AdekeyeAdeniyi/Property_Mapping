@@ -1,6 +1,3 @@
-import { MapEvent } from '@vis.gl/react-google-maps';
-import { City } from 'react-country-state-city/dist/esm/types';
-
 // Interface for latitude and longitude
 interface LatLong {
   latitude: number;
