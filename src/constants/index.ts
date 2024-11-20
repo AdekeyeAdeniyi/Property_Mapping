@@ -13,6 +13,13 @@ const PRICEINDICATOR = {
   high: 'green',
 };
 
+const LOCATIONBOUNDARIES = {
+  latMin: 24.396308,
+  latMax: 31.000968,
+  lngMin: -87.634918,
+  lngMax: -80.031362,
+};
+
 export {
   DEFAULT_COORDINATES,
   DEFAULT_ZOOM,
@@ -21,4 +28,5 @@ export {
   ZILL_API_KEY,
   ZILL_URL,
   PRICEINDICATOR,
+  LOCATIONBOUNDARIES,
 };

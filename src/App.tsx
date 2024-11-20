@@ -1,24 +1,50 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { APIProvider, Map, MapEvent } from '@vis.gl/react-google-maps';
-
+import { useState, useEffect } from 'react';
+import { APIProvider, Map } from '@vis.gl/react-google-maps';
 import { PropertyData } from './types/types';
 import PropertyMarker from './components/PropertyMarker';
-import { DEFAULT_ZOOM, MAP_ID, API_KEY } from './constants';
+import {
+  DEFAULT_ZOOM,
+  MAP_ID,
+  API_KEY,
+  DEFAULT_COORDINATES,
+} from './constants';
 import fetchZillowData from './api/fetchData';
 import PriceIndicator from './components/PriceIndicator';
 import Preloader from './components/Preloader';
-import requestLocation, { defaultLocation } from './libs/location';
+import { useGeolocated } from 'react-geolocated';
 
 const App: React.FC = () => {
   const [selectedZpid, setSelectedZpid] = useState<string | null>(null);
-
   const [zoomLevel] = useState(DEFAULT_ZOOM);
-  const mapRef = useRef<MapEvent | null>(null);
   const [properties, setProperties] = useState<PropertyData[]>([]);
   const [preloader, setPreloader] = useState(true);
-  const [coordinates, setCoordinates] = useState(defaultLocation);
+  const [coordinates, setCoordinates] = useState({
+    latitude: DEFAULT_COORDINATES.latitude,
+    longitude: DEFAULT_COORDINATES.longitude,
+  });
+  const [locationError, setLocationError] = useState<string | null>(null);
 
-  // Fetch data and update map on city change
+  const { coords, isGeolocationEnabled, isGeolocationAvailable } =
+    useGeolocated({
+      positionOptions: {
+        enableHighAccuracy: true,
+      },
+      userDecisionTimeout: 5000,
+    });
+
+  // Handle geolocation availability and permission status
+  useEffect(() => {
+    if (!isGeolocationAvailable) {
+      setLocationError('Geolocation is not supported by your browser.');
+    } else if (!isGeolocationEnabled) {
+      setLocationError(
+        'Please enable location access in your browser for a better, tailored experience.'
+      );
+    } else {
+      setLocationError(null);
+    }
+  }, [isGeolocationAvailable, isGeolocationEnabled]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -31,27 +57,28 @@ const App: React.FC = () => {
       } catch (error) {
         console.error('Error fetching Zillow data:', error);
       } finally {
-        setPreloader(false); // Stop preloader regardless of error
+        setPreloader(false);
       }
     };
 
-    const fetchLocation = async () => {
-      try {
-        const location = await requestLocation();
-        setCoordinates(location);
-      } catch (error) {
-        console.error('Error fetching location:', error);
-        setCoordinates({ latitude: 0, longitude: 0 }); // Fallback if error occurs
-      }
-    };
+    if (coords) {
+      setCoordinates({
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+      });
+    }
 
-    Promise.all([fetchData(), fetchLocation()]);
-  }, []);
+    fetchData();
+  }, [coords]);
 
   return (
-    <>
+    <div>
       {preloader ? (
         <Preloader />
+      ) : locationError ? (
+        <div className="w-full h-[100dvh] flex justify-center items-center flex-col text-lg">
+          <p>{locationError}</p>
+        </div>
       ) : (
         <div className="relative w-full h-[100vh] max-w-[100%] border-[8px]">
           <APIProvider apiKey={API_KEY}>
@@ -59,15 +86,12 @@ const App: React.FC = () => {
               mapId={MAP_ID}
               className="w-full h-full"
               defaultZoom={zoomLevel}
-              defaultCenter={{
+              center={{
                 lat: coordinates.latitude,
                 lng: coordinates.longitude,
               }}
-              gestureHandling={'greedy'}
+              gestureHandling="greedy"
               disableDefaultUI={true}
-              onTilesLoaded={map => {
-                mapRef.current = map;
-              }}
             >
               {properties.map(property => (
                 <PropertyMarker
@@ -91,7 +115,7 @@ const App: React.FC = () => {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
