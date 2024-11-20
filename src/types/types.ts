@@ -1,3 +1,4 @@
+import { MapEvent } from '@vis.gl/react-google-maps';
 import { City } from 'react-country-state-city/dist/esm/types';
 
 // Interface for latitude and longitude
@@ -31,9 +32,9 @@ export interface PropertyMarkerProps {
   property: PropertyData;
   selectedZpid: string | null;
   setSelectedZpid: (zpid: string | null) => void;
-  map: google.maps.Map;
 }
 
-export interface FloridaCitiesDropdownProps {
-  onCitySelect: (city: City) => void; // Prop to handle city selection
-}
+export type LocationCoordinates = {
+  latitude: number;
+  longitude: number;
+};

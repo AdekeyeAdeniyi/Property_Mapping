@@ -3,79 +3,50 @@ import { APIProvider, Map, MapEvent } from '@vis.gl/react-google-maps';
 
 import { PropertyData } from './types/types';
 import PropertyMarker from './components/PropertyMarker';
-import {
-  DEFAULT_COORDINATES,
-  DEFAULT_ZOOM,
-  MAP_ID,
-  API_KEY,
-} from './constants';
+import { DEFAULT_ZOOM, MAP_ID, API_KEY } from './constants';
 import fetchZillowData from './api/fetchData';
 import PriceIndicator from './components/PriceIndicator';
 import Preloader from './components/Preloader';
-import FloridaCitiesDropdown from './components/FloridaCitiesDropdown';
-import { City } from 'react-country-state-city/dist/esm/types';
+import requestLocation, { defaultLocation } from './libs/location';
 
 const App: React.FC = () => {
   const [selectedZpid, setSelectedZpid] = useState<string | null>(null);
 
-  const [zoomLevel, setZoomLevel] = useState(DEFAULT_ZOOM);
+  const [zoomLevel] = useState(DEFAULT_ZOOM);
   const mapRef = useRef<MapEvent | null>(null);
   const [properties, setProperties] = useState<PropertyData[]>([]);
   const [preloader, setPreloader] = useState(true);
-  const [coordinates, setCoordinates] = useState(DEFAULT_COORDINATES);
-
-  const [selectedCity, setSelectedCity] = useState<City | null>(() => {
-    const storedCity = localStorage.getItem('selectedCity');
-    return storedCity ? JSON.parse(storedCity) : null;
-  });
-
-  const handleCitySelection = (city: City) => {
-    setSelectedCity(city);
-  };
+  const [coordinates, setCoordinates] = useState(defaultLocation);
 
   // Fetch data and update map on city change
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await fetchZillowData();
-
         if (data) {
           setProperties(data);
-          setPreloader(false);
         } else {
           console.log('No record found');
         }
       } catch (error) {
         console.error('Error fetching Zillow data:', error);
-        setPreloader(false); // Stop preloader even if there's an error
+      } finally {
+        setPreloader(false); // Stop preloader regardless of error
       }
     };
 
-    fetchData();
-
-    if (selectedCity && mapRef.current) {
-      const { latitude, longitude } = selectedCity;
-      if (latitude && longitude) {
-        mapRef.current.map.panTo({
-          lat: parseFloat(latitude),
-          lng: parseFloat(longitude),
-        });
-        mapRef.current.map.setZoom(10);
+    const fetchLocation = async () => {
+      try {
+        const location = await requestLocation();
+        setCoordinates(location);
+      } catch (error) {
+        console.error('Error fetching location:', error);
+        setCoordinates({ latitude: 0, longitude: 0 }); // Fallback if error occurs
       }
-    }
+    };
 
-    if (selectedCity) {
-      setZoomLevel(10);
-      setCoordinates({
-        latitude: selectedCity.latitude
-          ? parseFloat(selectedCity.latitude)
-          : DEFAULT_COORDINATES.latitude,
-        longitude: selectedCity.longitude
-          ? parseFloat(selectedCity.longitude)
-          : DEFAULT_COORDINATES.longitude,
-      });
-    }
-  }, [selectedCity]);
+    Promise.all([fetchData(), fetchLocation()]);
+  }, []);
 
   return (
     <>
@@ -104,7 +75,6 @@ const App: React.FC = () => {
                   property={property}
                   selectedZpid={selectedZpid}
                   setSelectedZpid={setSelectedZpid}
-                  map={mapRef.current}
                 />
               ))}
             </Map>
@@ -117,7 +87,6 @@ const App: React.FC = () => {
           )}
 
           <div className="inline-flex gap-5 flex-col p-4 absolute w-fit top-0 left-0 z-10">
-            <FloridaCitiesDropdown onCitySelect={handleCitySelection} />
             <PriceIndicator />
           </div>
         </div>

@@ -1,5 +1,5 @@
-const DEFAULT_COORDINATES = { latitude: 27.994402, longitude: -81.760254 };
-const DEFAULT_ZOOM = 7;
+const DEFAULT_COORDINATES = { latitude: 25.761681, longitude: -80.191788 };
+const DEFAULT_ZOOM = 12;
 
 const API_KEY = import.meta.env.VITE_APP_GOOGLE_MAPS_API_KEY;
 const MAP_ID = import.meta.env.VITE_APP_GOOGLE_MAPS_ID;
