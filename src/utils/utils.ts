@@ -1,5 +1,4 @@
-import { LOCATIONBOUNDARIES, PRICEINDICATOR } from '../constants';
-
+import { PRICEINDICATOR } from '../constants';
 export const getThirtyFiveDaysBeforeDate = (): string => {
   const today = new Date();
   today.setDate(today.getDate() - 35);
@@ -61,11 +60,21 @@ export const convertTimestampToDate = (timestamp: number) => {
   return `${day}/${month}/${year}`;
 };
 
-export const isWithinFloridaBounds = (latitude: number, longitude: number) => {
+export const isWithinUSABounds = (
+  latitude: number,
+  longitude: number
+): boolean => {
+  const USA_BOUNDS = {
+    west: -125.0,
+    east: -66.0,
+    south: 24.396308,
+    north: 49.384358,
+  };
+
   return (
-    latitude >= LOCATIONBOUNDARIES.latMin &&
-    latitude <= LOCATIONBOUNDARIES.latMax &&
-    longitude >= LOCATIONBOUNDARIES.lngMin &&
-    longitude <= LOCATIONBOUNDARIES.lngMax
+    latitude >= USA_BOUNDS.south &&
+    latitude <= USA_BOUNDS.north &&
+    longitude >= USA_BOUNDS.west &&
+    longitude <= USA_BOUNDS.east
   );
 };

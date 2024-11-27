@@ -101,15 +101,19 @@ const PropertyMarker: React.FC<PropertyMarkerProps> = ({
                   <p className="text-gray-600 mt-2">
                     Sold Date:{' '}
                     <span className="font-medium text-gray-800">
-                      {convertTimestampToDate(
-                        property.hdpData.homeInfo.dateSold
-                      )}
+                      {property.hdpData.homeInfo.dateSold
+                        ? convertTimestampToDate(
+                            property.hdpData.homeInfo.dateSold
+                          )
+                        : 'No value'}
                     </span>
                   </p>
                   <p className="text-gray-600 mt-2">
                     Sold Price:{' '}
                     <span className="font-medium text-green-600">
-                      {convertToDollar(property.hdpData.homeInfo.price)}
+                      {property.hdpData.homeInfo.price
+                        ? convertToDollar(property.hdpData.homeInfo.price)
+                        : 'No value'}
                     </span>
                   </p>
                   <div className="flex items-center gap-2 mt-4 md:mt-auto">

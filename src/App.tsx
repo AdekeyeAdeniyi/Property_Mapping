@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useGeolocated } from 'react-geolocated';
 import { APIProvider, Map } from '@vis.gl/react-google-maps';
 import { PropertyData } from './types/types';
 import PropertyMarker from './components/PropertyMarker';
@@ -11,8 +12,7 @@ import {
 import fetchZillowData from './api/fetchData';
 import PriceIndicator from './components/PriceIndicator';
 import Preloader from './components/Preloader';
-import { useGeolocated } from 'react-geolocated';
-import { isWithinFloridaBounds } from './utils/utils';
+import { isWithinUSABounds } from './utils/utils';
 
 const App: React.FC = () => {
   const [selectedZpid, setSelectedZpid] = useState<string | null>(null);
@@ -49,7 +49,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchZillowData();
+        const data = await fetchZillowData(coordinates);
         if (data) {
           setProperties(data);
         } else {
@@ -63,22 +63,16 @@ const App: React.FC = () => {
     };
 
     if (coords) {
-      if (isWithinFloridaBounds(coords.latitude, coords.longitude)) {
+      if (isWithinUSABounds(coords.latitude, coords.longitude)) {
         setCoordinates({
           latitude: coords.latitude,
           longitude: coords.longitude,
-        });
-      } else {
-        console.log("You're not within the location boundaries");
-        setCoordinates({
-          latitude: DEFAULT_COORDINATES.latitude,
-          longitude: DEFAULT_COORDINATES.longitude,
         });
       }
     }
 
     fetchData();
-  }, [coords]);
+  }, []);
 
   return (
     <div>
@@ -95,7 +89,7 @@ const App: React.FC = () => {
               mapId={MAP_ID}
               className="w-full h-full"
               defaultZoom={zoomLevel}
-              center={{
+              defaultCenter={{
                 lat: coordinates.latitude,
                 lng: coordinates.longitude,
               }}
