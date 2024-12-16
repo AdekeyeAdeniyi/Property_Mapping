@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useGeolocated } from 'react-geolocated';
+import { useEffect, useState } from 'react';
 import { APIProvider, Map } from '@vis.gl/react-google-maps';
-import { PropertyData } from './types/types';
+import { LatLng, PropertyData } from './types/types';
 import PropertyMarker from './components/PropertyMarker';
 import {
   DEFAULT_ZOOM,
@@ -9,112 +8,107 @@ import {
   API_KEY,
   DEFAULT_COORDINATES,
 } from './constants';
-import fetchZillowData from './api/fetchData';
+import fetchPropertyData from './api/fetchData';
 import PriceIndicator from './components/PriceIndicator';
 import Preloader from './components/Preloader';
-import { isWithinUSABounds } from './utils/utils';
+import ExportData from './components/ExportData';
+import StateCityList from './components/CountryFilter';
+import { getFromDB } from './database/IndexedDB';
 
 const App: React.FC = () => {
+  const coordinates = DEFAULT_COORDINATES;
   const [selectedZpid, setSelectedZpid] = useState<string | null>(null);
-  const [zoomLevel] = useState(DEFAULT_ZOOM);
   const [properties, setProperties] = useState<PropertyData[]>([]);
-  const [preloader, setPreloader] = useState(true);
-  const [coordinates, setCoordinates] = useState({
-    latitude: DEFAULT_COORDINATES.latitude,
-    longitude: DEFAULT_COORDINATES.longitude,
-  });
-  const [locationError, setLocationError] = useState<string | null>(null);
+  const [newCoordinates, setNewCoordinate] = useState<LatLng>(coordinates);
+  const [preloader, setPreloader] = useState(false);
 
-  const { coords, isGeolocationEnabled, isGeolocationAvailable } =
-    useGeolocated({
-      positionOptions: {
-        enableHighAccuracy: true,
-      },
-      userDecisionTimeout: 5000,
-    });
+  const setCoordinates = () => {
+    const latlng = localStorage.getItem('latlng');
 
-  // Handle geolocation availability and permission status
-  useEffect(() => {
-    if (!isGeolocationAvailable) {
-      setLocationError('Geolocation is not supported by your browser.');
-    } else if (!isGeolocationEnabled) {
-      setLocationError(
-        'Please enable location access in your browser for a better, tailored experience.'
-      );
-    } else {
-      setLocationError(null);
+    if (latlng) {
+      const coordinates: LatLng = JSON.parse(latlng);
+      setNewCoordinate(coordinates);
     }
-  }, [isGeolocationAvailable, isGeolocationEnabled]);
+  };
 
-  useEffect(() => {
-    const fetchData = async () => {
+  const fetchData = async (stateCode: string | null, cities: string[]) => {
+    if (stateCode && cities.length > 0) {
+      setCoordinates();
+      setPreloader(true);
       try {
-        const data = await fetchZillowData(coordinates);
+        const data: PropertyData[] = await fetchPropertyData(stateCode, cities);
         if (data) {
           setProperties(data);
         } else {
           console.log('No record found');
         }
       } catch (error) {
-        console.error('Error fetching Zillow data:', error);
+        console.error('Error fetching properties data:', error);
       } finally {
         setPreloader(false);
       }
-    };
+    }
+  };
 
-    if (coords) {
-      if (isWithinUSABounds(coords.latitude, coords.longitude)) {
-        setCoordinates({
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-        });
-      }
+  useEffect(() => {
+    const stateCode = localStorage.getItem('statecode');
+
+    if (stateCode) {
+      const cachedProperties = async () => {
+        const res = await getFromDB(stateCode);
+        if (res) {
+          setProperties(res.value); // Set the cached properties
+        }
+      };
+
+      cachedProperties();
     }
 
-    fetchData();
+    setCoordinates();
   }, []);
 
   return (
     <div>
       {preloader ? (
         <Preloader />
-      ) : locationError ? (
-        <div className="w-[80%] mx-auto font-semibold h-[100dvh] flex justify-center items-center flex-col text-lg">
-          <p>{locationError}</p>
-        </div>
       ) : (
-        <div className="relative w-full h-[100vh] max-w-[100%] border-[8px]">
-          <APIProvider apiKey={API_KEY}>
-            <Map
-              mapId={MAP_ID}
-              className="w-full h-full"
-              defaultZoom={zoomLevel}
-              defaultCenter={{
-                lat: coordinates.latitude,
-                lng: coordinates.longitude,
-              }}
-              gestureHandling="greedy"
-              disableDefaultUI={true}
-            >
-              {properties.map(property => (
-                <PropertyMarker
-                  key={property.address}
-                  property={property}
-                  selectedZpid={selectedZpid}
-                  setSelectedZpid={setSelectedZpid}
-                />
-              ))}
-            </Map>
-          </APIProvider>
+        <div className="flex flex-col h-screen">
+          <div className="absolute left-4 z-20 top-4">
+            <StateCityList countryCode="US" handleFetchProperties={fetchData} />
+          </div>
 
-          {properties.length <= 0 && (
-            <h4 className="text-6xl absolute top-1/2 left-1/2 font-bold -translate-x-2/4 -translate-y-2/4 text-red-500">
-              No Record Found
-            </h4>
-          )}
+          <div className="relative w-full h-full max-w-full border-8">
+            <APIProvider apiKey={API_KEY}>
+              <Map
+                mapId={MAP_ID}
+                className="w-full h-full"
+                defaultZoom={DEFAULT_ZOOM}
+                defaultCenter={{
+                  lat: newCoordinates.lat || coordinates.lat,
+                  lng: newCoordinates.lng || coordinates.lng,
+                }}
+                gestureHandling="greedy"
+                disableDefaultUI
+              >
+                {properties.map(property => (
+                  <PropertyMarker
+                    key={property._id}
+                    property={property}
+                    selectedZpid={selectedZpid}
+                    setSelectedZpid={setSelectedZpid}
+                  />
+                ))}
+              </Map>
+            </APIProvider>
 
-          <div className="inline-flex gap-5 flex-col p-4 absolute w-fit top-0 left-0 z-10">
-            <PriceIndicator />
+            <div className="inline-flex gap-5 flex-col p-4 absolute top-0 right-0 z-10">
+              <PriceIndicator />
+            </div>
+            {properties.length > 0 && (
+              <div className="pt-2 text-right absolute bottom-6 right-4">
+                <ExportData properties={properties} />
+              </div>
+            )}
           </div>
         </div>
       )}

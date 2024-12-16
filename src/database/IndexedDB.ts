@@ -27,10 +27,3 @@ export const getFromDB = async (key: string) => {
   const tx = db.transaction(STORE_NAME, 'readonly');
   return await tx.store.get(key);
 };
-
-export const isDataStale = (timestamp: number, days: number = 7) => {
-  const now = new Date().getTime();
-  const diffInMs = now - timestamp;
-  const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
-  return diffInDays > days;
-};
