@@ -109,6 +109,12 @@ const App: React.FC = () => {
                 <ExportData properties={properties} />
               </div>
             )}
+
+            {properties.length <= 0 && (
+              <h1 className="text-2xl md:text-4xl lg:text-6xl font-bold text-red-800 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                No Record Found
+              </h1>
+            )}
           </div>
         </div>
       )}
