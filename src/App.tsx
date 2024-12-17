@@ -14,7 +14,6 @@ import Preloader from './components/Preloader';
 import ExportData from './components/ExportData';
 import StateCityList from './components/CountryFilter';
 import { getFromDB } from './database/IndexedDB';
-import StateCitySelector from './components/CountryFilter';
 
 const App: React.FC = () => {
   const coordinates = DEFAULT_COORDINATES;
