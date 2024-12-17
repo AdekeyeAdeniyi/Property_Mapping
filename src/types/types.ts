@@ -1,3 +1,5 @@
+import { Dispatch } from 'react';
+
 export interface PropertyMarkerProps {
   property: PropertyData;
   selectedZpid: string | null;
@@ -52,7 +54,8 @@ export interface ExportDataProps {
 }
 
 export interface StateCityListProps {
-  countryCode: string;
+  countryCode: number;
+  setNewCoordinate: Dispatch<React.SetStateAction<LatLng>>;
   handleFetchProperties: (stateCode: string | null, cities: string[]) => void;
 }
 

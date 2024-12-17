@@ -8,20 +8,20 @@ import {
   API_KEY,
   DEFAULT_COORDINATES,
 } from './constants';
-// import fetchPropertyData from './api/fetchData';
+import fetchPropertyData from './api/fetchData';
 import PriceIndicator from './components/PriceIndicator';
 import Preloader from './components/Preloader';
 import ExportData from './components/ExportData';
 import StateCityList from './components/CountryFilter';
 import { getFromDB } from './database/IndexedDB';
+import StateCitySelector from './components/CountryFilter';
 
 const App: React.FC = () => {
   const coordinates = DEFAULT_COORDINATES;
   const [selectedZpid, setSelectedZpid] = useState<string | null>(null);
   const [properties, setProperties] = useState<PropertyData[]>([]);
   const [newCoordinates, setNewCoordinate] = useState<LatLng>(coordinates);
-  // const [preloader, setPreloader] = useState(false);
-  const [preloader] = useState(false);
+  const [preloader, setPreloader] = useState(false);
 
   const setCoordinates = () => {
     const latlng = localStorage.getItem('latlng');
@@ -32,24 +32,24 @@ const App: React.FC = () => {
     }
   };
 
-  // const fetchData = async (stateCode: string | null, cities: string[]) => {
-  //   if (stateCode && cities.length > 0) {
-  //     setCoordinates();
-  //     setPreloader(true);
-  //     try {
-  //       const data: PropertyData[] = await fetchPropertyData(stateCode, cities);
-  //       if (data) {
-  //         setProperties(data);
-  //       } else {
-  //         console.log('No record found');
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching properties data:', error);
-  //     } finally {
-  //       setPreloader(false);
-  //     }
-  //   }
-  // };
+  const fetchData = async (stateCode: string | null, cities: string[]) => {
+    if (stateCode && cities.length > 0) {
+      setCoordinates();
+      setPreloader(true);
+      try {
+        const data: PropertyData[] = await fetchPropertyData(stateCode, cities);
+        if (data) {
+          setProperties(data);
+        } else {
+          console.log('No record found');
+        }
+      } catch (error) {
+        console.error('Error fetching properties data:', error);
+      } finally {
+        setPreloader(false);
+      }
+    }
+  };
 
   useEffect(() => {
     const stateCode = localStorage.getItem('statecode');
@@ -58,7 +58,7 @@ const App: React.FC = () => {
       const cachedProperties = async () => {
         const res = await getFromDB(stateCode);
         if (res) {
-          setProperties(res.value); // Set the cached properties
+          setProperties(res.value);
         }
       };
 
@@ -75,8 +75,11 @@ const App: React.FC = () => {
       ) : (
         <div className="flex flex-col h-screen">
           <div className="absolute left-4 z-20 top-4">
-            {/* <StateCityList countryCode="US" handleFetchProperties={fetchData} /> */}
-            <StateCityList />
+            <StateCityList
+              countryCode={233}
+              setNewCoordinate={setNewCoordinate}
+              handleFetchProperties={fetchData}
+            />
           </div>
 
           <div className="relative w-full h-full max-w-full border-8">
