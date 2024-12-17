@@ -12,7 +12,7 @@ import {
 import PriceIndicator from './components/PriceIndicator';
 import Preloader from './components/Preloader';
 import ExportData from './components/ExportData';
-// import StateCityList from './components/CountryFilter';
+import StateCityList from './components/CountryFilter';
 import { getFromDB } from './database/IndexedDB';
 
 const App: React.FC = () => {
@@ -74,9 +74,10 @@ const App: React.FC = () => {
         <Preloader />
       ) : (
         <div className="flex flex-col h-screen">
-          {/* <div className="absolute left-4 z-20 top-4">
-            <StateCityList countryCode="US" handleFetchProperties={fetchData} />
-          </div> */}
+          <div className="absolute left-4 z-20 top-4">
+            {/* <StateCityList countryCode="US" handleFetchProperties={fetchData} /> */}
+            <StateCityList />
+          </div>
 
           <div className="relative w-full h-full max-w-full border-8">
             <APIProvider apiKey={API_KEY}>
