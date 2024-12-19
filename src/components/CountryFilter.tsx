@@ -229,7 +229,6 @@ const StateCityList: React.FC<StateCityListProps> = ({
           </button>
         </div>
       )}
-      \
     </div>
   );
 };
