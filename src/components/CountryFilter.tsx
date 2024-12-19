@@ -14,13 +14,16 @@ const StateCityList: React.FC<StateCityListProps> = ({
   const [selectedState, setSelectedState] = useState<string | null>(null);
   const [excludedCities, setExcludedCities] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [pin, setPin] = useState<string>('');
+  const [isPinValid, setIsPinValid] = useState<boolean>(false);
+  const [actualPin] = useState<string>('5678933');
   const [, setSelectAll] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchStates = async () => {
       try {
-        const stateList = await GetState(countryCode); // Await the promise
+        const stateList = await GetState(countryCode);
         setStates(stateList);
       } catch (error) {
         console.error('Error fetching states:', error);
@@ -79,7 +82,7 @@ const StateCityList: React.FC<StateCityListProps> = ({
       .map(city => city.name);
 
     if (selectedCities.length > 0) {
-      const city = cities.find(city => city.name == selectedCities[0]);
+      const city = cities.find(city => city.name === selectedCities[0]);
 
       setNewCoordinate({
         lat: parseFloat(city!.latitude),
@@ -87,6 +90,18 @@ const StateCityList: React.FC<StateCityListProps> = ({
       });
 
       handleFetchProperties(selectedState, selectedCities);
+    }
+  };
+
+  const handlePinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    // Allow only numeric input
+    if (/^\d*$/.test(value)) {
+      setPin(value);
+
+      // Set validity if PIN matches actual PIN
+      setIsPinValid(value === actualPin);
     }
   };
 
@@ -115,7 +130,6 @@ const StateCityList: React.FC<StateCityListProps> = ({
           />
         </svg>
       </button>
-
       {/* Dropdown Content */}
       {isDropdownOpen && (
         <div className="z-10 bg-white rounded-lg shadow w-60 p-4 mt-3">
@@ -183,15 +197,39 @@ const StateCityList: React.FC<StateCityListProps> = ({
             </div>
           </div>
 
+          {/* Enter PIN */}
+          <div className="pb-2">
+            <label
+              htmlFor="pin-input"
+              className="block font-medium text-gray-900 text-base"
+            >
+              Enter PIN
+            </label>
+            <input
+              id="pin-input"
+              type="text"
+              value={pin}
+              onChange={handlePinChange}
+              maxLength={8}
+              className="w-full p-2.5 mt-1 border border-gray-300 rounded-lg"
+            />
+          </div>
+
           {/* Fetch Properties */}
           <button
             onClick={fetchPropertiesData}
-            className="w-full mt-2 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+            disabled={!isPinValid}
+            className={`w-full mt-2 py-2 rounded-lg transition ${
+              isPinValid
+                ? 'bg-blue-500 text-white hover:bg-blue-600'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
           >
             Fetch Properties
           </button>
         </div>
       )}
+      \
     </div>
   );
 };
