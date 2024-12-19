@@ -5,7 +5,6 @@ import { StateCityListProps } from '../types/types';
 
 const StateCityList: React.FC<StateCityListProps> = ({
   countryCode,
-  setNewCoordinate,
   handleFetchProperties,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
@@ -84,12 +83,12 @@ const StateCityList: React.FC<StateCityListProps> = ({
     if (selectedCities.length > 0) {
       const city = cities.find(city => city.name === selectedCities[0]);
 
-      setNewCoordinate({
-        lat: parseFloat(city!.latitude),
-        lng: parseFloat(city!.longitude),
-      });
-
-      handleFetchProperties(selectedState, selectedCities);
+      handleFetchProperties(
+        selectedState,
+        selectedCities,
+        parseFloat(city!.latitude),
+        parseFloat(city!.longitude)
+      );
     }
   };
 

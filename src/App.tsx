@@ -22,18 +22,17 @@ const App: React.FC = () => {
   const [newCoordinates, setNewCoordinate] = useState<LatLng>(coordinates);
   const [preloader, setPreloader] = useState(false);
 
-  const setCoordinates = () => {
-    const latlng = localStorage.getItem('latlng');
-
-    if (latlng) {
-      const coordinates: LatLng = JSON.parse(latlng);
-      setNewCoordinate(coordinates);
-    }
-  };
-
-  const fetchData = async (stateCode: string | null, cities: string[]) => {
+  const fetchData = async (
+    stateCode: string | null,
+    cities: string[],
+    lat: number,
+    lng: number
+  ) => {
     if (stateCode && cities.length > 0) {
-      setCoordinates();
+      setNewCoordinate({
+        lat: lat,
+        lng: lng,
+      });
       setPreloader(true);
       try {
         const data: PropertyData[] = await fetchPropertyData(stateCode, cities);
@@ -63,8 +62,6 @@ const App: React.FC = () => {
 
       cachedProperties();
     }
-
-    setCoordinates();
   }, []);
 
   return (
@@ -76,7 +73,6 @@ const App: React.FC = () => {
           <div className="absolute left-4 z-20 top-4">
             <StateCityList
               countryCode={233}
-              setNewCoordinate={setNewCoordinate}
               handleFetchProperties={fetchData}
             />
           </div>
